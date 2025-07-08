@@ -12,7 +12,7 @@ import numpy as np
 import warnings
 warnings.filterwarnings("ignore")
 
-data = pd.read_csv("diabetic_data.csv")
+data = pd.read_csv("data/diabetic_data.csv")
 data
 
 data.head()
@@ -291,6 +291,7 @@ balanced_data.corr()
 
 x = balanced_data.drop('readmitted', axis=1)
 y = balanced_data['readmitted']
+from sklearn.model_selection import train_test_split
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=42, stratify=y)
 
@@ -364,6 +365,93 @@ print(classification_report(y_test, pred))
 
 import joblib
 
+
 joblib.dump(pipe, "model_01.pkl")
 print("Model saved successfully!")
 
+from xgboost import XGBClassifier
+from sklearn.linear_model import LogisticRegression
+
+xgb_pipe = Pipeline([
+    ("pt", PowerTransformer()),
+    ("xgb", XGBClassifier(random_state=10, use_label_encoder=False, eval_metric='logloss'))
+])
+
+xgb_pipe.fit(x_train, y_train)
+
+print("\nXGBoost Training Accuracy:", xgb_pipe.score(x_train, y_train))
+print("XGBoost Testing Accuracy:", xgb_pipe.score(x_test, y_test))
+xgb_cv_score = cross_val_score(xgb_pipe, x_train, y_train, cv=5, scoring="accuracy")
+print("XGBoost Cross Validation Score:", np.mean(xgb_cv_score))
+
+xgb_pred = xgb_pipe.predict(x_test)
+print("XGBoost Confusion Matrix:")
+print(confusion_matrix(y_test, xgb_pred))
+print("XGBoost Classification Report:")
+print(classification_report(y_test, xgb_pred))
+
+joblib.dump(xgb_pipe, "xgb_model.pkl")
+print("XGBoost model saved successfully!")
+
+lr_pipe = Pipeline([
+    ("pt", PowerTransformer()),
+    ("lr", LogisticRegression(random_state=10, class_weight="balanced", max_iter=1000))
+])
+
+lr_pipe.fit(x_train, y_train)
+
+print("\nLogistic Regression Training Accuracy:", lr_pipe.score(x_train, y_train))
+print("Logistic Regression Testing Accuracy:", lr_pipe.score(x_test, y_test))
+lr_cv_score = cross_val_score(lr_pipe, x_train, y_train, cv=5, scoring="accuracy")
+print("Logistic Regression Cross Validation Score:", np.mean(lr_cv_score))
+
+lr_pred = lr_pipe.predict(x_test)
+print("Logistic Regression Confusion Matrix:")
+print(confusion_matrix(y_test, lr_pred))
+print("Logistic Regression Classification Report:")
+print(classification_report(y_test, lr_pred))
+
+joblib.dump(lr_pipe, "logistic_model.pkl")
+print("Logistic Regression model saved successfully!")
+
+
+
+# Collect predictions
+models = {
+    "Random Forest": pipe,
+    "XGBoost": xgb_pipe,
+    "Logistic Regression": lr_pipe
+}
+
+# Initialize metric lists
+model_names = []
+accuracy_list = []
+precision_list = []
+recall_list = []
+f1_list = []
+roc_auc_list = []
+
+for name, model in models.items():
+    y_pred = model.predict(x_test)
+    model_names.append(name)
+    accuracy_list.append(accuracy_score(y_test, y_pred))
+    precision_list.append(precision_score(y_test, y_pred))
+    recall_list.append(recall_score(y_test, y_pred))
+    f1_list.append(f1_score(y_test, y_pred))
+    roc_auc_list.append(roc_auc_score(y_test, y_pred))
+
+# Create a DataFrame with all results
+results_df = pd.DataFrame({
+    "Model": model_names,
+    "Accuracy": accuracy_list,
+    "Precision": precision_list,
+    "Recall": recall_list,
+    "F1 Score": f1_list,
+    "ROC AUC": roc_auc_list
+})
+
+# Display the table sorted by F1 Score (optional)
+results_df = results_df.sort_values(by="F1 Score", ascending=False).reset_index(drop=True)
+
+print("\nModel Comparison Table:")
+print(results_df)
