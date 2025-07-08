@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Diabetes Readmission Prediction</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Font Awesome Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #1976d2;
+      --background: #f0f4f8;
+      --card-bg: #ffffff;
+      --text: #333;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--background);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h2 {
+      margin-top: 30px;
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    form {
+      background-color: var(--card-bg);
+      padding: 30px;
+      width: 100%;
+      max-width: 550px;
+      margin: 30px auto;
+      border-radius: 12px;
+      box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .input-group {
+      margin-top: 15px;
+    }
+
+    .input-group label {
+      display: block;
+      color: var(--text);
+      font-weight: 500;
+      margin-bottom: 5px;
+    }
+
+    .input-group i {
+      margin-right: 8px;
+      color: var(--primary);
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+
+    input[type="submit"] {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px;
+      margin-top: 25px;
+      border-radius: 8px;
+      width: 100%;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #0d47a1;
+    }
+
+    .result {
+      background: #e3f2fd;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 16px;
+      margin-top: 20px;
+      color: #0d47a1;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h2><i class="fas fa-hospital-user"></i> Diabetes Readmission Predictor</h2>
+
+  <form method="POST" action="/predict">
+
+    {% set fields = [
+      ('race', 'Race (0=Caucasian, 1=AfricanAmerican, 2=Hispanic, 3=Other, 4=Asian)', 'fa-user'),
+      ('gender', 'Gender (0=Female, 1=Male)', 'fa-venus-mars'),
+      ('age', 'Age (numeric e.g., 55)', 'fa-hourglass-half'),
+      ('time_in_hospital', 'Time in Hospital (days)', 'fa-bed'),
+      ('max_glu_serum', 'Max Glucose Serum (0=Norm, 1=>200, 2=>300)', 'fa-vial'),
+      ('A1Cresult', 'A1C Result (0=Norm, 1=>7, 2=>8)', 'fa-dna'),
+      ('insulin', 'Insulin (0=No, 1=Steady, 2=Down, 3=Up)', 'fa-syringe'),
+      ('change', 'Medication Change? (0=No, 1=Yes)', 'fa-sync-alt'),
+      ('diabetesMed', 'On Diabetes Medication? (0=No, 1=Yes)', 'fa-capsules'),
+      ('number_emergency', 'Number of Emergency Visits', 'fa-ambulance'),
+      ('outpatient_to_inpatient_ratio', 'Outpatient to Inpatient Ratio', 'fa-chart-pie'),
+      ('total_procedures', 'Total Procedures (lab + other)', 'fa-clipboard-list'),
+      ('medication', 'Medication Score (meds + diagnoses)', 'fa-pills')
+    ] %}
+
+    {% for name, label, icon in fields %}
+      <div class="input-group">
+        <label for="{{ name }}"><i class="fas {{ icon }}"></i> {{ label }}</label>
+        <input type="{{ 'text' if 'ratio' in name else 'number' }}" name="{{ name }}" required>
+      </div>
+    {% endfor %}
+
+    <input type="submit" value="Predict Readmission">
+  </form>
+
+  {% if prediction_text %}
+    <div class="result">{{ prediction_text }}</div>
+  {% endif %}
+</body>
+</html>
