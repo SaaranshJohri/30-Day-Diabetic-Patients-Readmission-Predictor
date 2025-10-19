@@ -10,7 +10,7 @@ This project builds a machine learning model to predict whether a diabetic patie
 - **Training Accuracy**: **0.9977**  
 - **Testing Accuracy**: **0.9703**  
 - **Cross-Validation Score**: **0.9570**
-
+- **Model not added in the repository due to size issues**
 ---
 
 ## 🧠 Confusion Matrix (Test Set)
