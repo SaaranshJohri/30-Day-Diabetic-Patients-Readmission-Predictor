@@ -1,113 +1,117 @@
 # 🏥 30-Day Diabetic Patients Readmission Predictor
 
-This project builds a machine learning model to predict whether a diabetic patient will be readmitted to the hospital within 30 days of discharge. It includes model training, evaluation, and deployment using a Flask-based web application with a modern, user-friendly frontend.
+A machine learning web application that predicts whether a diabetic patient
+will be readmitted to the hospital within 30 days of discharge — built with
+an ensemble of gradient boosting models and deployed via Streamlit.
 
 ---
 
-## 📊 Model Overview
+## 📊 Model Performance
 
-- **Algorithm Used**: Random Forest Classifier  
-- **Training Accuracy**: **0.9977**  
-- **Testing Accuracy**: **0.9703**  
-- **Cross-Validation Score**: **0.9570**
-- **Model not added in the repository due to size issues**
+| Metric | Score |
+|--------|-------|
+| Training Accuracy | 0.9977 |
+| Testing Accuracy | 0.9703 |
+| Cross-Validation Score | 0.9570 |
+
+> Model file (~331 MB) is not included in this repository due to GitHub's
+> file size limit. Download instructions below.
+
 ---
 
 ## 🧠 Confusion Matrix (Test Set)
-|              | Predicted Not Readmitted | Predicted Readmitted |
-|--------------|--------------------------|-----------------------|
-| **Actual Not Readmitted** | 25,606 (TN)              | 1,517 (FP)            |
-| **Actual Readmitted**     | 89 (FN)                  | 27,034 (TP)           |
 
-- Very low false negatives (FN), which is crucial in healthcare.
-- Model tends to predict more false positives than false negatives—safer in medical use cases.
+|  | Predicted Not Readmitted | Predicted Readmitted |
+|--|--------------------------|----------------------|
+| **Actual Not Readmitted** | 25,606 (TN) | 1,517 (FP) |
+| **Actual Readmitted** | 89 (FN) | 27,034 (TP) |
+
+- Very low false negatives — critical for healthcare applications.
+- Model favours false positives over false negatives, the safer tradeoff
+  in a clinical context.
 
 ---
 
 ## 📈 Classification Report (Test Set)
 
-| Class | Precision | Recall | F1-Score | Support |
-|-------|-----------|--------|----------|---------|
-| Not Readmitted (0) | 0.94 | 0.94 | 0.97 | 27,123 |
-| Readmitted (1)     | 0.95 | 1.00 | 0.97 | 27,123 |
-| **Accuracy**       |      |      | **0.97** | 54,246 |
+| Class | Precision | Recall | F1-Score |
+|-------|-----------|--------|----------|
+| Not Readmitted (0) | 0.94 | 0.94 | 0.97 |
+| Readmitted (1) | 0.95 | 1.00 | 0.97 |
+| **Overall Accuracy** | | | **0.97** |
 
-> 🔍 **Interpretation**:  
-> The model demonstrates **exceptional recall (1.00)** for readmitted patients, making it highly effective at identifying high-risk cases.
-
----
-
-## ⚙️ Technologies Used
-
-- Python
-- Scikit-learn
-- Flask
-- PowerTransformer
-- Joblib
-- Bootstrap (Frontend)
-- HTML5, FontAwesome (UI)
+The model achieves **perfect recall (1.00)** for readmitted patients,
+meaning it misses almost no high-risk cases — the most important
+property for a clinical screening tool.
 
 ---
 
-## 🌐 Web Interface Features
+## 🖥️ Dashboard Features
 
-The trained model is deployed using Flask and includes a responsive HTML5-based UI.
+Built with **Streamlit** — replaces the original Flask frontend with a
+faster, more maintainable single-file deployment.
 
-**Frontend Features:**
-- Clean, healthcare-themed design using Bootstrap and CSS
-- Inputs for age, race, gender, glucose levels, insulin use, etc.
-- Prediction output with:
-  - **Risk Status**: Likely / Not Likely
-  - **Confidence Score**
-- Icons for input clarity using FontAwesome
-
----
-
-## 🧪 Sample Use Cases
-
-### ✅ Readmitted Patient
-- Age: 85  
-- Gender: Female  
-- Glucose: >300  
-- A1Cresult: >8  
-- Insulin: Up  
-- Outpatient visits: 0  
-- Inpatient visits: 3  
-
-→ **Prediction: Likely to be readmitted**
+- Inputs organised into four clinical sections:
+  Patient Demographics · Hospital Stay · Lab Results · Medications
+- Risk output with probability score and colour-coded verdict
+  (High Risk / Low Risk)
+- Animated gauge chart showing readmission probability
+- Quick-view summary chips for key patient indicators
+- Prediction threshold set at **≥ 25%** for high-risk classification
+- Clinical disclaimer on every result
 
 ---
 
-### ❌ Not Readmitted Patient
-- Age: 35  
-- Gender: Male  
-- Glucose: Normal  
-- A1Cresult: None  
-- Insulin: No  
-- Outpatient visits: 2  
-- Inpatient visits: 0  
+## ⚙️ Tech Stack
 
-→ **Prediction: Not likely to be readmitted**
+| Layer | Technology |
+|-------|------------|
+| Model | Scikit-learn · Gradient Boosting · PowerTransformer |
+| Backend | Python · Joblib |
+| Frontend | Streamlit · Plotly |
+| Deployment | Streamlit Community Cloud |
 
 ---
 
-## 📁 Files
+## 🚀 Run Locally
 
-| File | Description |
-|------|-------------|
-| `app.py` | Flask app for backend processing |
-| `templates/form.html` | HTML frontend |
-| `README.md` | You’re here. |
+```bash
+git clone https://github.com/SaaranshJohri/30-Day-Diabetic-Patients-Readmission-Predictor
+cd 30-Day-Diabetic-Patients-Readmission-Predictor
+
+python -m venv venv
+venv\Scripts\activate        # Windows
+# source venv/bin/activate   # macOS/Linux
+
+pip install -r requirements.txt
+```
+
+Download the model file and place it at `model/model_01.pkl`,
+then run:
+
+```bash
+streamlit run app.py
+```
+
+## 🧪 Sample Predictions
+
+**High Risk Patient**
+Age: 85 · Female · Glucose >300 · A1C >8 · Insulin: Up · 3 prior inpatient visits
+→ `Likely to be readmitted`
+
+**Low Risk Patient**
+Age: 35 · Male · Glucose Normal · A1C None · Insulin: No · 2 outpatient visits
+→ `Not likely to be readmitted`
 
 ---
 
 ## 📬 Contact
 
-**Author:** Saaransh Johri  
-**Affiliation:** MIT World Peace University  
-📧 saaransh.johri@mitwpu.edu.in
+**Saaransh Johri** — MIT World Peace University, Pune
+saaransh.johri@mitwpu.edu.in
 
 ---
 
-> 🚨 **Disclaimer:** This is a research prototype. It should not be used for real medical decision-making without clinical validation.
-
+> ⚕️ **Disclaimer:** This is a research prototype and decision-support tool
+> only. It does not replace professional medical judgement or clinical
+> validation.
